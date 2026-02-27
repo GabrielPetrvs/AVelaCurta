@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Vela Curta — O Jornal da Teologia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f5f0e8;
+      --ink: #1a1008;
+      --sepia: #8b6914;
+      --red: #8b1a1a;
+      --light-line: #c8b89a;
+      --bg: #d4c5a0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      font-family: 'Libre Baskerville', serif;
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* ══ NAV ══ */
+    .nav-outer {
+      max-width: 960px;
+      margin: 20px auto 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 4px;
+    }
+
+    .nav-label {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ink);
+      white-space: nowrap;
+      background: var(--paper);
+      padding: 6px 12px;
+      border: 1px solid var(--ink);
+      flex-shrink: 0;
+    }
+
+    .editions-scroll {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--sepia) transparent;
+    }
+
+    .editions-scroll::-webkit-scrollbar { height: 4px; }
+    .editions-scroll::-webkit-scrollbar-thumb { background: var(--sepia); border-radius: 2px; }
+
+    .ed-btn {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      background: var(--paper);
+      border: 1px solid var(--sepia);
+      color: var(--sepia);
+      padding: 5px 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .ed-btn:hover { background: var(--sepia); color: var(--paper); }
+    .ed-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .ed-btn:disabled { opacity: 0.4; cursor: default; }
+    .ed-btn:disabled:hover { background: var(--paper); color: var(--sepia); }
+
+    /* ══ PAGE ══ */
+    .page {
+      max-width: 960px;
+      margin: 8px auto 30px;
+      background: var(--paper);
+      box-shadow: 4px 4px 30px rgba(0,0,0,0.4), -2px -2px 15px rgba(0,0,0,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.4;
+    }
+
+    /* ══ HEADER ══ */
+    .header {
+      padding: 18px 30px 0;
+      text-align: center;
+      border-bottom: 3px double var(--ink);
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Special Elite', cursive;
+      font-size: 0.68rem;
+      letter-spacing: 0.05em;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--ink);
+      margin-bottom: 10px;
+    }
+
+    .motto {
+      font-style: italic;
+      color: var(--red);
+      font-size: 0.74rem;
+      font-family: 'Libre Baskerville', serif;
+    }
+
+    .masthead {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: clamp(3.5rem, 8vw, 6.5rem);
+      line-height: 1;
+      color: var(--ink);
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.15);
+      padding: 6px 0;
+    }
+
+    .sub-masthead {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.78rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--sepia);
+      padding: 4px 0 10px;
+    }
+
+    .edition-bar {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Special Elite', cursive;
+      font-size: 0.68rem;
+      letter-spacing: 0.04em;
+      padding: 6px 0;
+      border-top: 1px solid var(--ink);
+    }
+
+    /* ══ TICKER & BREAKING ══ */
+    .breaking {
+      background: var(--red);
+      color: #f5f0e8;
+      text-align: center;
+      padding: 5px 20px;
+      font-family: 'Special Elite', cursive;
+      font-size: 0.78rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .ticker-wrap {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 5px 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker {
+      display: inline-block;
+      animation: ticker 34s linear infinite;
+      font-family: 'Special Elite', cursive;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+    }
+
+    @keyframes ticker {
+      0%   { transform: translateX(100vw); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* ══ EDITION PANELS ══ */
+    .edition-panel { display: none; }
+    .edition-panel.active { display: block; }
+
+    /* ══ CONTENT ══ */
+    .content { padding: 20px 28px; }
+
+    .section-label {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--red);
+      border-bottom: 1px solid var(--red);
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .headline-section {
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+    }
+
+    .main-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+
+    .main-headline em { font-style: italic; color: var(--red); }
+
+    .deck {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 1rem;
+      font-style: italic;
+      line-height: 1.5;
+      color: #444;
+      margin-bottom: 12px;
+    }
+
+    .byline {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--sepia);
+      margin-bottom: 10px;
+    }
+
+    .article-text {
+      font-size: 0.88rem;
+      line-height: 1.7;
+      column-count: 2;
+      column-gap: 24px;
+      column-rule: 1px solid var(--light-line);
+      text-align: justify;
+    }
+
+    .article-text p + p { text-indent: 1.2em; }
+
+    .article-text p:first-child::first-letter {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.8em;
+      font-weight: 900;
+      float: left;
+      line-height: 0.75;
+      margin: 6px 8px 0 0;
+      color: var(--red);
+    }
+
+    .three-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      border-top: 2px solid var(--ink);
+      padding-top: 16px;
+      margin-bottom: 16px;
+    }
+
+    .col {
+      padding: 0 16px;
+      border-right: 1px solid var(--light-line);
+    }
+
+    .col:first-child { padding-left: 0; }
+    .col:last-child { padding-right: 0; border-right: none; }
+
+    .col-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .col-headline em { font-style: italic; color: var(--red); }
+
+    .col-text {
+      font-size: 0.82rem;
+      line-height: 1.6;
+      text-align: justify;
+    }
+
+    .col-text p + p { text-indent: 1em; }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 24px;
+      border-top: 2px solid var(--ink);
+      padding-top: 16px;
+      margin-bottom: 16px;
+    }
+
+    .pull-quote {
+      border-top: 3px solid var(--ink);
+      border-bottom: 3px solid var(--ink);
+      padding: 12px 8px;
+      margin: 14px 0;
+      text-align: center;
+    }
+
+    .pull-quote p {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      line-height: 1.4;
+      color: var(--red);
+    }
+
+    .pull-quote cite {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--sepia);
+      display: block;
+      margin-top: 6px;
+    }
+
+    .box {
+      border: 2px solid var(--ink);
+      padding: 12px;
+      margin-top: 16px;
+    }
+
+    .box-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-align: center;
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+
+    .box-text { font-size: 0.8rem; line-height: 1.6; }
+    .box ul { list-style: none; padding: 0; }
+    .box ul li::before { content: "✝ "; color: var(--red); font-size: 0.7em; }
+
+    .classifieds {
+      background: #ede7d5;
+      border: 1px dashed var(--sepia);
+      padding: 12px 16px;
+      border-top: 2px solid var(--ink);
+    }
+
+    .classifieds-title {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: 1.4rem;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .classifieds-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .classified-item {
+      font-size: 0.75rem;
+      line-height: 1.5;
+      border-right: 1px solid var(--light-line);
+      padding-right: 10px;
+    }
+
+    .classified-item:last-child { border-right: none; }
+
+    .classified-item strong {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      display: block;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+
+    /* ══ ARCHIVE ══ */
+    .archive-section {
+      background: #ede7d5;
+      border-top: 3px double var(--ink);
+      padding: 20px 28px 28px;
+    }
+
+    .archive-title {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .archive-subtitle {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-align: center;
+      color: var(--sepia);
+      margin-bottom: 16px;
+    }
+
+    .archive-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+      gap: 12px;
+    }
+
+    .archive-card {
+      background: var(--paper);
+      border: 1px solid var(--sepia);
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .archive-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--red);
+    }
+
+    .archive-card:hover:not(.coming-soon) {
+      box-shadow: 3px 3px 12px rgba(0,0,0,0.2);
+      transform: translateY(-2px);
+    }
+
+    .archive-card.active-card {
+      border-color: var(--ink);
+      background: var(--ink);
+    }
+
+    .archive-card.active-card .arch-date,
+    .archive-card.active-card .arch-headline { color: var(--paper); }
+    .archive-card.active-card .arch-label { color: #e8c97a; }
+
+    .arch-label {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 4px;
+    }
+
+    .arch-date {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: 1.1rem;
+      line-height: 1.1;
+      margin-bottom: 6px;
+      color: var(--ink);
+    }
+
+    .arch-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.78rem;
+      font-style: italic;
+      line-height: 1.3;
+      color: #444;
+    }
+
+    .arch-divider {
+      border: none;
+      border-top: 1px solid var(--light-line);
+      margin: 8px 0;
+    }
+
+    .archive-card.coming-soon { opacity: 0.45; cursor: default; }
+
+    .arch-coming {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--sepia);
+      font-style: italic;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* ══ FOOTER ══ */
+    .footer {
+      border-top: 3px double var(--ink);
+      padding: 10px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Special Elite', cursive;
+      font-size: 0.65rem;
+      letter-spacing: 0.05em;
+      color: var(--sepia);
+    }
+
+    @media (max-width: 680px) {
+      .article-text { column-count: 1; }
+      .three-col, .two-col, .classifieds-grid { grid-template-columns: 1fr; }
+      .col { border-right: none; border-bottom: 1px solid var(--light-line); padding: 12px 0; }
+      .top-bar, .edition-bar { flex-direction: column; gap: 4px; text-align: center; }
+      .archive-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="nav-outer">
+  <div class="nav-label">✝ Edições</div>
+  <div class="editions-scroll">
+    <button class="ed-btn active" data-ed="ed1" onclick="switchEdition('ed1',this)">Ano I · Nº 1 — Jan</button>
+    <!-- NOVA EDIÇÃO: copie a linha acima, troque data-ed e o texto -->
+  </div>
+</div>
+
+<div class="page">
+
+  <header class="header">
+    <div class="top-bar">
+      <span>Fundado por teólogos exaustos desde o I Ano</span>
+      <span class="motto">«Ninguém aguenta notícia longa depois das Laudes»</span>
+      <span>Circulação: Pátio, Corredor B e Além</span>
+    </div>
+    <div class="masthead">A Vela Curta</div>
+    <div class="sub-masthead">O Diário Não-Oficial da Teologia</div>
+    <div class="edition-bar">
+      <span id="edVol">Ano I — Nº 1 · Janeiro</span>
+      <span>✦ &nbsp; Breviter et Veraciter &nbsp; ✦</span>
+      <span>Preço: uma devoção sincera</span>
+    </div>
+  </header>
+
+  <div class="ticker-wrap">
+    <span class="ticker">
+      ✝ &nbsp; URGENTE: Teólogo do III ano cita Rahner sem ter lido Rahner — comissão investiga &nbsp;|&nbsp;
+      ✝ &nbsp; Escatologia confirmada no cardápio de sexta-feira &nbsp;|&nbsp;
+      ✝ &nbsp; Diácono usa "hermenêutica da continuidade" para justificar atraso de 20 min &nbsp;|&nbsp;
+      ✝ &nbsp; Hora Santa: 15 presentes, 12 dormindo — "quórum contemplativo", diz formador &nbsp;|&nbsp;
+      ✝ &nbsp; Coro da missa ensaia há 3 semanas; situação ainda "crítica", admite regente &nbsp;&nbsp;
+    </span>
+  </div>
+
+  <div class="breaking">⚡ Última hora: Aula de Cristologia suprimida — professor entrou em silêncio admirativo após abrir o PowerPoint</div>
+
+  <!-- ══ EDIÇÃO 1 · JANEIRO ══ -->
+  <div class="edition-panel active" id="ed1">
+    <div class="content">
+
+      <section class="headline-section">
+        <div class="section-label">Manchete</div>
+        <h1 class="main-headline">Seminarista Afirma Ter Tido <em>«Revelação Mística»</em> na Aula de Patrística; Colegas Identificam Ronco Gregoriano</h1>
+        <p class="deck">Irmão Tertúlio jura que os olhos fechados eram "contemplação interior"; professor encaminha caso à direção espiritual com nota: urgente.</p>
+        <p class="byline">Por Nosso Repórter de Plantão, Corredor B &nbsp;|&nbsp; Janeiro</p>
+        <div class="article-text">
+          <p>O seminário foi sacudido na última quarta-feira quando o teólogo Tertúlio de Aquino, do II Ano, foi flagrado em estado que ele mesmo classificou como "êxtase contemplativo" durante a exposição sobre os Padres Capadócios. Testemunhas relatam som ritmado e contínuo que três colegas com formação litúrgica identificaram como "gregoriano espontâneo em modo dórico".</p>
+          <p>Interrogado pelo mestre de disciplina, Tertúlio sustentou com admirável serenidade que havia atingido o terceiro grau da lectio divina. O argumento foi classificado como "corajoso, porém inverossímil" pelo formador, que o encaminhou para conversa espiritual de urgência dupla.</p>
+          <p>O professor, que prefere não ser identificado além de "patrístico e cansado", declarou a este jornal que a situação era "antropologicamente reveladora" — e que o evento seria inserido como estudo de caso no próximo trabalho, sob o título "O Homem entre Ato e Potência: relato de um Capadócio vivo".</p>
+          <p>Tertúlio, contatado durante o recreio, pediu que sua identidade fosse preservada "neste período de purificação". A redação respeita o sigilo da consciência, mas anota que havia apenas um Tertúlio presente na sala.</p>
+        </div>
+      </section>
+
+      <div class="three-col">
+        <div class="col">
+          <div class="section-label">Liturgia</div>
+          <h2 class="col-headline">Missal da Sacristia Desaparece pela <em>Terceira Semana Consecutiva</em></h2>
+          <div class="col-text">
+            <p>O missal sumiu novamente. O I Ano culpa "corrente de ar"; o II Ano aponta "distração pós-jantar"; o III guarda silêncio e olha para o teto. O diácono afixou bilhete: «SABE QUEM É». O bilhete também sumiu.</p>
+            <p>A missa de domingo foi celebrada com o missal do reitor, emprestado com anotação manuscrita: "última vez, em nome de Deus".</p>
+          </div>
+          <div class="pull-quote">
+            <p>«Não é falta de fé. É falta de sono — que, no fundo, é a mesma coisa.»</p>
+            <cite>— Anônimo, Corredor B, 23h17</cite>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="section-label">Refeitório</div>
+          <h2 class="col-headline">Cardápio de Sexta Elevado à Categoria de <em>Penitência Canônica</em></h2>
+          <div class="col-text">
+            <p>O peixe de sexta gerou rara solidariedade intracomunitária: seminaristas do I ao III Ano concordaram em algo pela primeira vez no semestre. «Agora entendo a abstinência», declarou fonte do II Ano. «É infinitamente mais misericordiosa».</p>
+            <p>O cozinheiro, sr. Onofre, defende o prato como "nutritivo e mortificante, à maneira dos clássicos". Cita são João da Cruz e uma tia de Pernambuco como influências. Petição circula assinada: «Frei Faminto», «Servo do Sofrimento», «B. de Aquino».</p>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="section-label">Formação</div>
+          <h2 class="col-headline">Silêncio Grande Dura Recorde de <em>4min37s</em> Antes do Colapso</h2>
+          <div class="col-text">
+            <p>O período mais longo de silêncio grande documentado: quatro minutos e trinta e sete segundos. Interrompido quando seminarista do I Ano perguntou, em voz alta, onde ficava o banheiro. O formador classificou o evento como "promissor". Análise posterior revelou que a maioria havia simplesmente dormido antes de chegar ao corredor.</p>
+          </div>
+          <div class="box">
+            <div class="box-title">⚠ Avisos Oficiais</div>
+            <div class="box-text">
+              <ul>
+                <li>Celular no coro: segunda ocorrência implica solo no Credo.</li>
+                <li>Proibido usar "discernimento" como desculpa para atrasos.</li>
+                <li>Vela do oratório não é para aquecer café.</li>
+                <li>«Não sei» não é resposta teológica após o I Ano.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div class="section-label">Formação Humana</div>
+          <h2 class="col-headline" style="font-size:1.3rem;margin-bottom:8px;">Diretor Espiritual Publica Lista de <em>«Desculpas Teológicas»</em> Não Aceitas a Partir de Fevereiro</h2>
+          <p class="byline">Redação &nbsp;|&nbsp; Setor de Misericórdia Criativa</p>
+          <div class="col-text">
+            <p>Após semestre intenso, o diretor espiritual compilou, por "necessidade pastoral urgente", lista de justificativas proscritas. Entre elas: «o Espírito me conduziu», quando o destino envolve a cozinha às 23h; «foi uma graça inesperada» para o esquecimento de tarefas; e «estava em oração» para qualquer coisa entre 14h e 16h, período que coincide com o descanso pós-almoço.</p>
+            <p>O documento veta também citações do Catecismo fora de contexto como desvio de assunto na conversa formativa. «Sei quando estão fazendo isso», afirmou a fonte, identificada apenas como «padre ciente».</p>
+          </div>
+        </div>
+        <div>
+          <div class="box" style="margin-top:0;">
+            <div class="box-title">📅 Semana Típica</div>
+            <div class="box-text" style="font-size:0.76rem;line-height:1.9;">
+              <strong>Seg.</strong> — Cristologia (almofada: tentação)<br>
+              <strong>Ter.</strong> — Capítulo de Culpa: tema livre<br>
+              <strong>Qua.</strong> — Silêncio Grande (tentativa nº 48)<br>
+              <strong>Qui.</strong> — Visita pastoral (banho obrigatório)<br>
+              <strong>Sex.</strong> — Peixe. Deus tenha misericórdia.<br>
+              <strong>Sáb.</strong> — Limpeza geral: ninguém escapa<br>
+              <strong>Dom.</strong> — Missa solene + descanso providencial
+            </div>
+          </div>
+          <div class="pull-quote" style="margin-top:12px;">
+            <p>«A teologia consola. O cardápio, nem sempre.»</p>
+            <cite>— Provérbio do Refeitório, sem data</cite>
+          </div>
+        </div>
+      </div>
+
+      <div class="classifieds">
+        <div class="classifieds-title">Classificados da Sacristia</div>
+        <div class="classifieds-grid">
+          <div class="classified-item">
+            <strong>Vende-se</strong>
+            Resumo de Escatologia em linguagem humana. Nunca usado. Dono optou pela Pastoral. Troca por vaga na fila do café. Bater suavemente: quarto 14.
+          </div>
+          <div class="classified-item">
+            <strong>Procura-se</strong>
+            Organista para missa de domingo. Não precisa saber bem — já é o padrão. Apresentar-se à comissão litúrgica antes de quinta, ou depois, tanto faz.
+          </div>
+          <div class="classified-item">
+            <strong>Perdidos & Achados</strong>
+            Encontrado: 1 propósito de emenda, abandonado na sala de estudos desde a semana 4. Retirar na portaria mediante comprovação de pertença.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- FIM EDIÇÃO 1 -->
+
+  <!-- ══ ARQUIVO ══ -->
+  <div class="archive-section">
+    <div class="archive-title">Arquivo</div>
+    <div class="archive-subtitle">✦ Todas as Edições d'A Vela Curta ✦</div>
+    <div class="archive-grid">
+
+      <div class="archive-card active-card" data-arc="ed1" onclick="switchEdition('ed1', document.querySelector('[data-ed=ed1]'))">
+        <div class="arch-label">Ano I · Nº 1</div>
+        <div class="arch-date">Janeiro</div>
+        <hr class="arch-divider">
+        <div class="arch-headline">«Revelação Mística» ou sono profundo? Tertúlio não comenta.</div>
+      </div>
+
+      <!-- PRÓXIMAS EDIÇÕES — remova "coming-soon" e adicione onclick quando publicar -->
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 2</div>
+        <div class="arch-date">Fevereiro</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 3</div>
+        <div class="arch-date">Março</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 4</div>
+        <div class="arch-date">Abril</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 5</div>
+        <div class="arch-date">Maio</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 6</div>
+        <div class="arch-date">Junho</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 7</div>
+        <div class="arch-date">Julho</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 8</div>
+        <div class="arch-date">Agosto</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 9</div>
+        <div class="arch-date">Setembro</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 10</div>
+        <div class="arch-date">Outubro</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 11</div>
+        <div class="arch-date">Novembro</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 12</div>
+        <div class="arch-date">Dezembro</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span>© A Vela Curta — Todos os pecados reservados</span>
+    <span>✦ ✝ ✦</span>
+    <span>Impresso espiritualmente no coração dos redatores</span>
+  </footer>
+
+</div>
+
+<script>
+  const edMeta = {
+    ed1: 'Ano I — Nº 1 · Janeiro',
+    // NOVA EDIÇÃO: ed2: 'Ano I — Nº 2 · Fevereiro',
+  };
+
+  function switchEdition(edId, btnEl) {
+    document.querySelectorAll('.edition-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById(edId);
+    if (panel) panel.classList.add('active');
+
+    document.querySelectorAll('.ed-btn').forEach(b => b.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+
+    document.querySelectorAll('.archive-card:not(.coming-soon)').forEach(c => c.classList.remove('active-card'));
+    const card = document.querySelector(`.archive-card[data-arc="${edId}"]`);
+    if (card) card.classList.add('active-card');
+
+    if (edMeta[edId]) document.getElementById('edVol').textContent = edMeta[edId];
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
