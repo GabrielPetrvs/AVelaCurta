@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Vela Curta — O Jornal da Teologia</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPGVsbGlwc2UgY3g9IjE2IiBjeT0iNyIgcng9IjMiIHJ5PSI1IiBmaWxsPSIjZjVhNjIzIi8+CiAgPGVsbGlwc2UgY3g9IjE2IiBjeT0iOCIgcng9IjIiIHJ5PSIzLjUiIGZpbGw9IiNmOWQwNmEiLz4KICA8cmVjdCB4PSIxNS4yIiB5PSIxMCIgd2lkdGg9IjEuNiIgaGVpZ2h0PSIzIiBmaWxsPSIjMzMzIi8+CiAgPHJlY3QgeD0iMTEiIHk9IjEzIiB3aWR0aD0iMTAiIGhlaWdodD0iMTQiIHJ4PSIxLjUiIGZpbGw9IiNmNWYwZTgiIHN0cm9rZT0iIzhiNjkxNCIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgPGVsbGlwc2UgY3g9IjE2IiBjeT0iMTMiIHJ4PSI1IiByeT0iMS41IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3QgeD0iOSIgeT0iMjUiIHdpZHRoPSIxNCIgaGVpZ2h0PSIzIiByeD0iMSIgZmlsbD0iIzhiNjkxNCIvPgo8L3N2Zz4=">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=UnifrakturMaguntia&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f5f0e8;
+      --ink: #1a1008;
+      --sepia: #8b6914;
+      --red: #8b1a1a;
+      --light-line: #c8b89a;
+      --bg: #d4c5a0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      font-family: 'Libre Baskerville', serif;
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* ══ NAV ══ */
+    .nav-outer {
+      max-width: 960px;
+      margin: 20px auto 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 4px;
+    }
+
+    .nav-label {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ink);
+      white-space: nowrap;
+      background: var(--paper);
+      padding: 6px 12px;
+      border: 1px solid var(--ink);
+      flex-shrink: 0;
+    }
+
+    .editions-scroll {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--sepia) transparent;
+    }
+
+    .editions-scroll::-webkit-scrollbar { height: 4px; }
+    .editions-scroll::-webkit-scrollbar-thumb { background: var(--sepia); border-radius: 2px; }
+
+    .ed-btn {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      background: var(--paper);
+      border: 1px solid var(--sepia);
+      color: var(--sepia);
+      padding: 5px 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .ed-btn:hover { background: var(--sepia); color: var(--paper); }
+    .ed-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .ed-btn:disabled { opacity: 0.4; cursor: default; }
+    .ed-btn:disabled:hover { background: var(--paper); color: var(--sepia); }
+
+    /* ══ PAGE ══ */
+    .page {
+      max-width: 960px;
+      margin: 8px auto 30px;
+      background: var(--paper);
+      box-shadow: 4px 4px 30px rgba(0,0,0,0.4), -2px -2px 15px rgba(0,0,0,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.4;
+    }
+
+    /* ══ HEADER ══ */
+    .header {
+      padding: 18px 30px 0;
+      text-align: center;
+      border-bottom: 3px double var(--ink);
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Special Elite', cursive;
+      font-size: 0.68rem;
+      letter-spacing: 0.05em;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--ink);
+      margin-bottom: 10px;
+    }
+
+    .motto {
+      font-style: italic;
+      color: var(--red);
+      font-size: 0.74rem;
+      font-family: 'Libre Baskerville', serif;
+    }
+
+    .masthead {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: clamp(3.5rem, 8vw, 6.5rem);
+      line-height: 1;
+      color: var(--ink);
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.15);
+      padding: 6px 0;
+    }
+
+    .sub-masthead {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.78rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--sepia);
+      padding: 4px 0 10px;
+    }
+
+    .edition-bar {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Special Elite', cursive;
+      font-size: 0.68rem;
+      letter-spacing: 0.04em;
+      padding: 6px 0;
+      border-top: 1px solid var(--ink);
+    }
+
+    /* ══ TICKER & BREAKING ══ */
+    .breaking {
+      background: var(--red);
+      color: #f5f0e8;
+      text-align: center;
+      padding: 5px 20px;
+      font-family: 'Special Elite', cursive;
+      font-size: 0.78rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .ticker-wrap {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 5px 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker {
+      display: inline-block;
+      animation: ticker 70s linear infinite;
+      font-family: 'Special Elite', cursive;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+    }
+
+    @keyframes ticker {
+      0%   { transform: translateX(100vw); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* ══ EDITION PANELS ══ */
+    .edition-panel { display: none; }
+    .edition-panel.active { display: block; }
+
+    /* ══ CONTENT ══ */
+    .content { padding: 20px 28px; }
+
+    .section-label {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--red);
+      border-bottom: 1px solid var(--red);
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .headline-section {
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 18px;
+      margin-bottom: 18px;
+    }
+
+    .main-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+
+    .main-headline em { font-style: italic; color: var(--red); }
+
+    .deck {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 1rem;
+      font-style: italic;
+      line-height: 1.5;
+      color: #444;
+      margin-bottom: 12px;
+    }
+
+    .byline {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--sepia);
+      margin-bottom: 10px;
+    }
+
+    .article-text {
+      font-size: 0.88rem;
+      line-height: 1.7;
+      column-count: 2;
+      column-gap: 24px;
+      column-rule: 1px solid var(--light-line);
+      text-align: justify;
+    }
+
+    .article-text p + p { text-indent: 1.2em; }
+
+    .article-text p:first-child::first-letter {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.8em;
+      font-weight: 900;
+      float: left;
+      line-height: 0.75;
+      margin: 6px 8px 0 0;
+      color: var(--red);
+    }
+
+    .three-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      border-top: 2px solid var(--ink);
+      padding-top: 16px;
+      margin-bottom: 16px;
+    }
+
+    .col {
+      padding: 0 16px;
+      border-right: 1px solid var(--light-line);
+    }
+
+    .col:first-child { padding-left: 0; }
+    .col:last-child { padding-right: 0; border-right: none; }
+
+    .col-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .col-headline em { font-style: italic; color: var(--red); }
+
+    .col-text {
+      font-size: 0.82rem;
+      line-height: 1.6;
+      text-align: justify;
+    }
+
+    .col-text p + p { text-indent: 1em; }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 24px;
+      border-top: 2px solid var(--ink);
+      padding-top: 16px;
+      margin-bottom: 16px;
+    }
+
+    .pull-quote {
+      border-top: 3px solid var(--ink);
+      border-bottom: 3px solid var(--ink);
+      padding: 12px 8px;
+      margin: 14px 0;
+      text-align: center;
+    }
+
+    .pull-quote p {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      line-height: 1.4;
+      color: var(--red);
+    }
+
+    .pull-quote cite {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--sepia);
+      display: block;
+      margin-top: 6px;
+    }
+
+    .box {
+      border: 2px solid var(--ink);
+      padding: 12px;
+      margin-top: 16px;
+    }
+
+    .box-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-align: center;
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+
+    .box-text { font-size: 0.8rem; line-height: 1.6; }
+    .box ul { list-style: none; padding: 0; }
+    .box ul li::before { content: "✝ "; color: var(--red); font-size: 0.7em; }
+
+    .classifieds {
+      background: #ede7d5;
+      border: 1px dashed var(--sepia);
+      padding: 12px 16px;
+      border-top: 2px solid var(--ink);
+    }
+
+    .classifieds-title {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: 1.4rem;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .classifieds-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .classified-item {
+      font-size: 0.75rem;
+      line-height: 1.5;
+      border-right: 1px solid var(--light-line);
+      padding-right: 10px;
+    }
+
+    .classified-item:last-child { border-right: none; }
+
+    .classified-item strong {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      display: block;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+
+    /* ══ ARCHIVE ══ */
+    .archive-section {
+      background: #ede7d5;
+      border-top: 3px double var(--ink);
+      padding: 20px 28px 28px;
+    }
+
+    .archive-title {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .archive-subtitle {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-align: center;
+      color: var(--sepia);
+      margin-bottom: 16px;
+    }
+
+    .archive-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+      gap: 12px;
+    }
+
+    .archive-card {
+      background: var(--paper);
+      border: 1px solid var(--sepia);
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .archive-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--red);
+    }
+
+    .archive-card:hover:not(.coming-soon) {
+      box-shadow: 3px 3px 12px rgba(0,0,0,0.2);
+      transform: translateY(-2px);
+    }
+
+    .archive-card.active-card {
+      border-color: var(--ink);
+      background: var(--ink);
+    }
+
+    .archive-card.active-card .arch-date,
+    .archive-card.active-card .arch-headline { color: var(--paper); }
+    .archive-card.active-card .arch-label { color: #e8c97a; }
+
+    .arch-label {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 4px;
+    }
+
+    .arch-date {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: 1.1rem;
+      line-height: 1.1;
+      margin-bottom: 6px;
+      color: var(--ink);
+    }
+
+    .arch-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.78rem;
+      font-style: italic;
+      line-height: 1.3;
+      color: #444;
+    }
+
+    .arch-divider {
+      border: none;
+      border-top: 1px solid var(--light-line);
+      margin: 8px 0;
+    }
+
+    .archive-card.coming-soon { opacity: 0.45; cursor: default; }
+
+    .arch-coming {
+      font-family: 'Special Elite', cursive;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--sepia);
+      font-style: italic;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* ══ FOOTER ══ */
+    .footer {
+      border-top: 3px double var(--ink);
+      padding: 10px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Special Elite', cursive;
+      font-size: 0.65rem;
+      letter-spacing: 0.05em;
+      color: var(--sepia);
+    }
+
+    @media (max-width: 680px) {
+      .article-text { column-count: 1; }
+      .three-col, .two-col, .classifieds-grid { grid-template-columns: 1fr; }
+      .col { border-right: none; border-bottom: 1px solid var(--light-line); padding: 12px 0; }
+      .top-bar, .edition-bar { flex-direction: column; gap: 4px; text-align: center; }
+      .archive-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="nav-outer">
+  <div class="nav-label">✝ Edições</div>
+  <div class="editions-scroll">
+    <button class="ed-btn active" data-ed="ed2" onclick="switchEdition('ed2',this)">Ano I · Nº 1 — Fev</button>
+    <!-- NOVA EDIÇÃO: copie a linha acima, troque data-ed e o texto -->
+  </div>
+</div>
+
+<div class="page">
+
+  <header class="header">
+    <div class="top-bar">
+      <span>Fundado por teólogos exaustos desde o I Ano</span>
+      <span class="motto">«Ninguém aguenta notícia longa depois das Laudes»</span>
+      <span>Circulação: Pátio, Corredor B e Além</span>
+    </div>
+    <div class="masthead">A Vela Curta</div>
+    <div class="sub-masthead">O Diário Não-Oficial da Teologia</div>
+    <div class="edition-bar">
+      <span id="edVol">Ano I — Nº 1 · Fevereiro</span>
+      <span>✦ &nbsp; Breviter et Veraciter &nbsp; ✦</span>
+      <span>Preço: uma devoção sincera</span>
+    </div>
+  </header>
+
+  <div class="ticker-wrap">
+    <span class="ticker">
+      ✝ &nbsp; URGENTE: Teólogo do III ano cita Rahner sem ter lido Rahner — comissão investiga &nbsp;|&nbsp;
+      ✝ &nbsp; Escatologia confirmada no cardápio de sexta-feira &nbsp;|&nbsp;
+      ✝ &nbsp; Diácono usa "hermenêutica da continuidade" para justificar atraso de 20 min &nbsp;|&nbsp;
+      ✝ &nbsp; Hora Santa: 15 presentes, 12 dormindo — "quórum contemplativo", diz formador &nbsp;|&nbsp;
+      ✝ &nbsp; Coro da missa ensaia há 3 semanas; situação ainda "crítica", admite regente &nbsp;&nbsp;
+    </span>
+  </div>
+
+  <div class="breaking">⚡ Última hora: Aula de Cristologia suprimida — professor entrou em silêncio admirativo após abrir o PowerPoint</div>
+
+  <!-- ══ EDIÇÃO 1 · FEVEREIRO ══ -->
+  <div class="edition-panel active" id="ed2">
+    <div class="content">
+
+      <section class="headline-section">
+        <div class="section-label">Manchete</div>
+        <h1 class="main-headline">Padre Vindo de Maringá Prega Retiro de Silêncio; Comunidade Descobre que <em>«Silêncio»</em> tem Exceção no Jantar</h1>
+        <p class="deck">Pe. Sandro garantiu profundidade filosófica e antropológica nos pregações — e churrasco na quinta. O irmão Gabriel fez aniversário. Coincidências não existem.</p>
+        <p class="byline">Por Nossa Enviada Especial ao Silêncio, que Preferiu não Calar &nbsp;|&nbsp; Fevereiro</p>
+        <div class="article-text">
+          <p>O seminário recebeu neste mês o Pe. Sandro, vindo de Maringá com as malas cheias de espiritualidade e um programa de retiro de silêncio que, segundo as fontes, era absolutamente rigoroso — com a única, discreta e providencial exceção do jantar. «O silêncio é necessário para a interioridade», explicou o pregador na abertura. «O jantar, para a caridade fraterna». A comunidade acolheu a distinção com entusiasmo teológico unânime.</p>
+          <p>Os temas abordados ao longo do retiro percorreram as alturas da filosofia e da antropologia cristã, com densidade que alguns seminaristas descreveram como "muito boa" e outros como "muito". Questões sobre a pessoa humana, a interioridade e a transcendência foram tratadas com rigor — o que não impediu que, na hora do jantar, as mesmas questões fossem debatidas em volume progressivamente maior à medida que a noite avançava.</p>
+          <p>Na quinta-feira, o retiro registrou seu momento mais aguardado: o aniversário do irmão Gabriel. Pe. Sandro, movido pelo que testemunhas descrevem como "generosidade pastoral de alcance gastronômico", bancou um churrasco em homenagem ao aniversariante — e, note-se, também ao pregador. «Foi um gesto de caridade», confirmou fonte próxima à grelha. «Com braseiro e tudo».</p>
+          <p>O retiro encerrou-se com aprovação geral. A redação d'A Vela Curta registra que o silêncio foi observado com fidelidade exemplar em todos os momentos nos quais não havia comida disponível.</p>
+        </div>
+      </section>
+
+      <div class="three-col">
+        <div class="col">
+          <div class="section-label">Vida Pastoral</div>
+          <h2 class="col-headline">Abertura do Ano Pastoral Tem Procissão <em>Interminável</em> e Tiazinhas Organizadoras</h2>
+          <div class="col-text">
+            <p>A abertura do ano pastoral foi marcada por uma procissão com os banners de todas as pastorais — cerimônia descrita pelos presentes como "bonita", "longa" e "cada vez mais longa". O desfile de estandartes atravessou o espaço disponível com solenidade crescente, enquanto um grupo de senhoras voluntárias tentava reorganizar o cortejo em tempo real, com sugestões que, segundo relatos, "vinham de todos os lados e em simultâneo".</p>
+            <p>Após a missa, a comunidade se dispersou em clima festivo — interrompido abruptamente quando teve início o Grenal. O que se seguiu está coberto pelo sigilo da consciência coletiva.</p>
+          </div>
+          <div class="pull-quote">
+            <p>«A procissão acabou. O Grenal, infelizmente, também.»</p>
+            <cite>— Fonte identificada apenas como "colorado abatido"</cite>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="section-label">Esporte & Fé</div>
+          <h2 class="col-headline">Derrota do Inter Deixa Reitor e Seminaristas <em>«Meio Abalados»</em>; Formação Espiritual Segue</h2>
+          <div class="col-text">
+            <p>O Grenal disputado logo após a missa de abertura pastoral produziu no seminário um estado de espírito que os mais comedidos classificaram como "abalado" e os mais honestos, como "deplorável". O reitor, que prefere não ser citado nominalmente nesta coluna, foi visto em silêncio contemplativo prolongado — distinto, contudo, do silêncio do retiro de Pe. Sandro, pois este último era voluntário.</p>
+            <p>Teólogos do seminário debatem se a derrota configura provação, purificação ou simplesmente futebol. Ainda sem consenso. A formação espiritual continua normalmente para os gremistas.</p>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="section-label">Vida Acadêmica</div>
+          <h2 class="col-headline">PUC Inicia Semestre com <em>Pataquadas</em> Clássicas; Frei Susin Comparece</h2>
+          <div class="col-text">
+            <p>As primeiras semanas de aula na PUC transcorreram dentro da tradição institucional: com a quantidade habitual de pataquadas, horários que surpreeendem, e aquela energia específica de quem ainda não sabe bem o que está fazendo ali. A Aula Magna contou com a presença do Frei Susin, referência teológica de peso, e encerrou com a bênção de Dom Juarez, que, com a sabedoria dos anos, limitou-se a dizer: «APROVEITEM!».</p>
+            <p>A frase foi recebida com risos, silêncio e pelo menos três interpretações hermenêuticas distintas. Ninguém discordou.</p>
+          </div>
+          <div class="box">
+            <div class="box-title">⚠ Avisos</div>
+            <div class="box-text">
+              <ul>
+                <li>Silêncio do retiro vale em todos os corredores. Exceto no jantar. Oficialmente.</li>
+                <li>Organização de procissão: apenas um coordenador por vez.</li>
+                <li>Resultados de Grenal não são tema de direção espiritual.</li>
+                <li>«APROVEITEM» é conselho de bispo. Leve a sério.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div class="section-label">Vida Comunitária</div>
+          <h2 class="col-headline" style="font-size:1.3rem;margin-bottom:8px;">Ordenações Diaconais se Aproximam; Comunidade Oscila entre <em>Alegria Fraterna</em> e Apreensão Discreta</h2>
+          <p class="byline">Redação &nbsp;|&nbsp; Setor de Notícias Solenes</p>
+          <div class="col-text">
+            <p>As tão aguardadas ordenações diaconais estão se aproximando, e o seminário vive o clima próprio desses momentos: uma mistura de alegria genuína, emoção fraterna e aquela apreensão silenciosa que ninguém nomeia mas todos sentem. Os candidatos estão sendo observados com uma atenção que eles mesmos descrevem como "carinhosa" e que os observadores descrevem como "intensa".</p>
+            <p>Fontes bem informadas garantem que as ordenações serão solenes, bonitas e emocionantes. Fontes igualmente bem informadas garantem que os envolvidos estão dormindo mal há pelo menos duas semanas. As duas informações são consideradas compatíveis e até complementares pela teologia da vocação.</p>
+          </div>
+        </div>
+        <div>
+          <div class="box" style="margin-top:0;">
+            <div class="box-title">🌱 Nova Horta Comunitária</div>
+            <div class="box-text" style="font-size:0.8rem;line-height:1.7;">
+              O seminário anuncia com entusiasmo o início da nova horta comunitária. O projeto é descrito pelos idealizadores como "formativo, ecológico e laudatosiano". Ainda não há consensus sobre quem vai regar quando chover, quem vai capinar quando não chover, e o que fazer com a produção quando — e se — algo crescer. Os detalhes estão em discernimento.
+            </div>
+          </div>
+          <div class="pull-quote" style="margin-top:12px;">
+            <p>«Semear com fé. Regar com responsabilidade. Colher com sorte.»</p>
+            <cite>— Lema não oficial da Horta, versão preliminar</cite>
+          </div>
+        </div>
+      </div>
+
+      <div class="classifieds">
+        <div class="classifieds-title">Classificados da Sacristia</div>
+        <div class="classifieds-grid">
+          <div class="classified-item">
+            <strong>Procura-se</strong>
+            Júlio ainda procura sua sobrepeliz. Desaparecida em data incerta, local desconhecido, sob circunstâncias que ele prefere não detalhar. Quem souber, avisar com discrição. Recompensa: gratidão e uma Ave-Maria.
+          </div>
+          <div class="classified-item">
+            <strong>Atenção</strong>
+            Ordenações diaconais a caminho. Todos estão apreensivos. Os candidatos, os formadores, os colegas, a família, o porteiro. Oração coletiva recomendada. Espontânea, de preferência.
+          </div>
+          <div class="classified-item">
+            <strong>Comunidade Informa</strong>
+            Nova horta em construção. Voluntários bem-vindos para plantar. Para capinar, procurar o coordenador. Para regar, consultar a escala. Escala ainda não existe. Detalhes em breve.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- FIM EDIÇÃO 1 · FEVEREIRO -->
+
+  <!-- ══ ARQUIVO ══ -->
+  <div class="archive-section">
+    <div class="archive-title">Arquivo</div>
+    <div class="archive-subtitle">✦ Todas as Edições d'A Vela Curta ✦</div>
+    <div class="archive-grid">
+
+      <div class="archive-card active-card" data-arc="ed2" onclick="switchEdition('ed2', document.querySelector('[data-ed=ed2]'))">
+        <div class="arch-label">Ano I · Nº 1</div>
+        <div class="arch-date">Fevereiro</div>
+        <hr class="arch-divider">
+        <div class="arch-headline">Retiro de silêncio, churrasco de aniversário e Grenal: mês movimentado.</div>
+        <hr class="arch-divider">
+        <a href="edicao-01-fevereiro.html" style="font-family:'Special Elite',cursive;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#8b6914;text-decoration:none;" onclick="event.stopPropagation()">✦ Edição completa</a>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 3</div>
+        <div class="arch-date">Março</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 4</div>
+        <div class="arch-date">Abril</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 5</div>
+        <div class="arch-date">Maio</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 6</div>
+        <div class="arch-date">Junho</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 7</div>
+        <div class="arch-date">Julho</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 8</div>
+        <div class="arch-date">Agosto</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 9</div>
+        <div class="arch-date">Setembro</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 10</div>
+        <div class="arch-date">Outubro</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 11</div>
+        <div class="arch-date">Novembro</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+      <div class="archive-card coming-soon">
+        <div class="arch-label">Ano I · Nº 12</div>
+        <div class="arch-date">Dezembro</div>
+        <hr class="arch-divider">
+        <div class="arch-coming">Em breve</div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span>© A Vela Curta — Todos os pecados reservados</span>
+    <span>✦ ✝ ✦</span>
+    <span>Impresso espiritualmente no coração dos redatores</span>
+  </footer>
+
+</div>
+
+<script>
+  const edMeta = {
+    ed2: 'Ano I — Nº 1 · Fevereiro',
+    // NOVA EDIÇÃO: ed3: 'Ano I — Nº 2 · Março',
+  };
+
+  function switchEdition(edId, btnEl) {
+    document.querySelectorAll('.edition-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById(edId);
+    if (panel) panel.classList.add('active');
+
+    document.querySelectorAll('.ed-btn').forEach(b => b.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+
+    document.querySelectorAll('.archive-card:not(.coming-soon)').forEach(c => c.classList.remove('active-card'));
+    const card = document.querySelector(`.archive-card[data-arc="${edId}"]`);
+    if (card) card.classList.add('active-card');
+
+    if (edMeta[edId]) document.getElementById('edVol').textContent = edMeta[edId];
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
